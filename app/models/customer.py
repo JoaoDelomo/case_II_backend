@@ -1,8 +1,9 @@
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, Field
 
 class CustomerCreate(BaseModel):
     name: str
     email: EmailStr
+    phone: str = Field(..., pattern=r'^\d{10,11}$')
     cpf: str
     password: str
     cep: str

@@ -1,6 +1,6 @@
 import re
 import requests
-from app.database import costumers_collection
+from app.database import customers_collection
 from passlib.context import CryptContext
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -59,5 +59,18 @@ def create_customer(customer_data: dict):
         raise ValueError("CEP inválido ou não encontrado")
 
     # Insere no banco de dados
-    result = costumers_collection.insert_one(customer_data)
+    result = customers_collection.insert_one(customer_data)
     return result.inserted_id  # Retorna o ID do documento criado
+
+def authenticate_customer_by_email_or_phone(identifier: str, password: str) -> dict | None:
+    """
+    Autentica o cliente verificando e-mail/telefone e senha.
+    Retorna o cliente se autenticado, ou None caso contrário.
+    """
+    # Verificar se é e-mail ou telefone
+    query_field = "email" if "@" in identifier else "phone"
+    customer = customers_collection.find_one({query_field: identifier})
+
+    if not customer or not verify_password(password, customer["hashed_password"]):
+        return None
+    return customer
