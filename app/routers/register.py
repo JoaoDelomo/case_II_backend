@@ -1,24 +1,30 @@
 from fastapi import APIRouter, HTTPException
 from app.models.customer import CustomerCreate
-from app.services.customer_service import create_customer, get_street_from_cep
+from app.services.customer_service import create_customer, get_street_from_cep, is_valid_password
 from app.database import costumers_collection
 
 router = APIRouter()
 
 @router.post("/register")
 def register_customer(customer: CustomerCreate):
+    # Verificar se o e-mail já existe
     existing_customer = costumers_collection.find_one({"email": customer.email})
     if existing_customer:
         raise HTTPException(status_code=400, detail="E-mail já cadastrado")
     
-    # Buscar a rua automaticamente pelo CEP
-    street = get_street_from_cep(customer.cep)
-    if not street:
-        raise HTTPException(status_code=400, detail="CEP inválido ou não encontrado")
-    
-    customer.street = street  # Adiciona a rua ao objeto `customer`
+    # Validar a senha
+    if not is_valid_password(customer.password):
+        raise HTTPException(
+            status_code=400,
+            detail="A senha deve conter pelo menos 4 letras, 2 números e 1 caractere especial"
+        )
 
-    # Criar o cliente no banco de dados
+    # Buscar a rua automaticamente pelo CEP
+    customer.street = get_street_from_cep(customer.cep)
+    if not customer.street:
+        raise HTTPException(status_code=400, detail="CEP inválido ou não encontrado")
+
+    # Criar o cliente no banco
     new_customer = create_customer(customer.dict())
     return {"message": "Cliente registrado com sucesso", "id": str(new_customer)}
 
