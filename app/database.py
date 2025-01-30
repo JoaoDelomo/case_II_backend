@@ -4,3 +4,9 @@ MONGO_URI = "mongodb+srv://admin:admin@delomo.zxqnf.mongodb.net/?authSource=admi
 client = MongoClient(MONGO_URI)
 db = client["case_II"]
 customers_collection = db["customers"]
+collaborators_collection = db["collaborators"]
+feedbacks_collection = db["feedback"]
+funcionarios_collection = db['funcionarios']
+
+
+
