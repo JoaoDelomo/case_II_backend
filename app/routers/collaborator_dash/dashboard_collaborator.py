@@ -7,7 +7,7 @@ from bson import ObjectId
 router = APIRouter()
 
 ### 📌 1️⃣ ROTA - Resumo dos feedbacks ###
-@router.get("/dashboard/feedbacks", tags=["Dashboard"])
+@router.get("/feedbacks", tags=["Dashboard"])
 def get_feedbacks_dashboard(collaborator=Depends(get_current_collaborator)):
     feedbacks = list(feedbacks_collection.find({}, {"_id": 0, "SatisfacaoPosAtendimento": 1}))
     feedback_summary = {}

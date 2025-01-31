@@ -12,7 +12,7 @@ class Employee(BaseModel):
     Salario: float
 
 ### 📌 3️⃣ ROTA - Listar funcionários ###
-@router.get("/dashboard/employees", tags=["Dashboard"])
+@router.get("/employees", tags=["Dashboard"])
 def get_employees_dashboard(collaborator=Depends(get_current_collaborator)):
     employees = list(funcionarios_collection.find({}, {"_id": 0, "Funcionario": 1, "Salario": 1}))
     return {"employees": employees}

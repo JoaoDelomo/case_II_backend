@@ -1,4 +1,9 @@
 from pydantic import BaseModel, EmailStr, Field
+from fastapi import APIRouter, Depends, HTTPException
+from app.database import customers_collection
+from app.services.auth_service import get_current_customer
+
+router = APIRouter()
 
 class CustomerCreate(BaseModel):
     name: str
@@ -12,10 +17,25 @@ class CustomerCreate(BaseModel):
     complement: str | None = None
     city: str
     state: str
-    card_last_digits: str | None = None  # Últimos 4 dígitos
-    card_holder_name: str | None = None  # Nome do titular
-    card_expiry_date: str | None = None  # Data de expiração (MM/YY)
-    card_cvv: str | None = None          # CVV criptografado
 
 class CustomerDB(CustomerCreate):
     hashed_password: str
+
+
+@router.get("/customer", tags=["Customer"])
+def get_customer_data(customer=Depends(get_current_customer)):
+    """
+    🔹 Retorna os dados do cliente autenticado
+    """
+    if not customer:
+        raise HTTPException(status_code=404, detail="Cliente não encontrado")
+
+    # 🔹 Converte o `_id` de ObjectId para string
+    customer["_id"] = str(customer["_id"])
+
+    # 🔹 Remove a senha antes de retornar os dados
+    customer.pop("hashed_password", None)
+
+    print("📡 Dados do cliente retornados:", customer)  # <-- Log no backend
+
+    return customer

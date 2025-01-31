@@ -1,20 +1,29 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Response
 from app.models.customer import CustomerCreate
 from app.services.customer_service import create_customer, is_valid_password
 from app.database import customers_collection
 
 router = APIRouter()
 
+@router.options("/register")
+def preflight_register():
+    """
+    Responde a requisições OPTIONS para o CORS.
+    """
+    return Response(headers={"Access-Control-Allow-Origin": "*",
+                             "Access-Control-Allow-Methods": "POST, OPTIONS",
+                             "Access-Control-Allow-Headers": "*"})
+
+
 @router.post("/register")
 def register_customer(customer: CustomerCreate):
     """
-    Registra um novo cliente. 
-    Agora, o front-end é responsável por obter a rua via ViaCEP.
+    Registra um novo cliente.
     """
     # 🔹 Verificar se o e-mail já existe
     if customers_collection.find_one({"email": customer.email}):
         raise HTTPException(status_code=400, detail="E-mail já cadastrado")
-    
+
     # 🔹 Verificar se o telefone já existe
     if customers_collection.find_one({"phone": customer.phone}):
         raise HTTPException(status_code=400, detail="Telefone já cadastrado")
