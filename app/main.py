@@ -7,6 +7,8 @@ from app.routers.login.login_collaborator import router as login_collaborator_ro
 from app.routers.collaborator_dash.dashboard_collaborator import router as dashboard_router
 from app.routers.collaborator_dash.employees import router as employees_router
 from app.routers.collaborator_dash.collaborators import router as collaborators_router
+from app.routers.collaborator_dash.plans import router as plans_router
+
 
 app = FastAPI()
 
@@ -21,6 +23,8 @@ app.include_router(login_collaborator_router, prefix="/api")
 app.include_router(dashboard_router, prefix="/api/collaborator")  # Dashboard
 app.include_router(employees_router, prefix="/api/dashboard")  # Updated prefix
 app.include_router(collaborators_router, prefix="/api/dashboard")  # Changed this line
+app.include_router(plans_router, prefix="/api/collaborator")
+
 
 @app.get("/")
 def root():
