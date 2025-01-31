@@ -9,7 +9,7 @@ from app.routers.collaborator_dash.employees import router as employees_router
 from app.routers.collaborator_dash.collaborators import router as collaborators_router
 from app.routers.collaborator_dash.plans import router as plans_router
 from app.routers.collaborator_dash.candidates import router as candidates_router
-
+from fastapi.middleware.cors import CORSMiddleware
 
 
 app = FastAPI()
@@ -25,11 +25,16 @@ app.include_router(login_collaborator_router, prefix="/api")
 app.include_router(dashboard_router, prefix="/api/collaborator")  # Dashboard
 app.include_router(employees_router, prefix="/api/dashboard")  # Updated prefix
 app.include_router(collaborators_router, prefix="/api/dashboard")  # Changed this line
-app.include_router(plans_router, prefix="/api/collaborator")
 app.include_router(candidates_router, prefix="/api/collaborator")
+app.include_router(plans_router, prefix="/api")  # 🔹 Garante que a rota será /api/plans
 
 
 
-@app.get("/")
-def root():
-    return {"message": "API funcionando"}
+# 🔹 Adicionar suporte a CORS
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # 🔹 Substitua por ["http://localhost:3000"] se for React
+    allow_credentials=True,
+    allow_methods=["*"],  # 🔹 Permite todos os métodos (GET, POST, PUT, DELETE)
+    allow_headers=["*"],  # 🔹 Permite todos os headers
+)

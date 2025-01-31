@@ -42,13 +42,14 @@ def create_collaborator(collaborator_data: dict):
     result = collaborators_collection.insert_one(collaborator_data)
     return result.inserted_id
 
-def authenticate_collaborator_by_email(email: str, password: str) -> dict | None:
+def authenticate_collaborator(email: str, cpf: str, password: str) -> dict | None:
     """
-    Autentica o colaborador verificando e-mail e senha.
+    Autentica o colaborador verificando e-mail, CPF e senha.
     Retorna o colaborador se autenticado, ou None caso contrário.
     """
-    collaborator = collaborators_collection.find_one({"email": email})
+    collaborator = collaborators_collection.find_one({"email": email, "cpf": cpf})
     if not collaborator or not verify_password(password, collaborator["hashed_password"]):
         return None
     return collaborator
+
 
