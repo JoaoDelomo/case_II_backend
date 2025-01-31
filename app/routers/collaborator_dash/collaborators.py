@@ -137,20 +137,21 @@ def update_collaborator(
 @router.delete("/collaborators/{collaborator_id}", tags=["Dashboard"])
 def delete_collaborator(collaborator_id: str, current_collaborator=Depends(get_current_collaborator)):
     """
-    Remove um colaborador
+    Permite que qualquer colaborador remova outro colaborador.
     """
     try:
-        object_id = ObjectId(collaborator_id)
+        object_id = ObjectId(collaborator_id)  # Converte o ID para ObjectId do MongoDB
     except:
         raise HTTPException(status_code=400, detail="ID inválido")
 
-    # Only allow users to delete their own account
-    if str(current_collaborator["_id"]) != collaborator_id:
-        raise HTTPException(status_code=403, detail="Acesso não autorizado")
-
-    result = collaborators_collection.delete_one({"_id": object_id})
-    
-    if result.deleted_count == 0:
+    # Verifica se o colaborador existe antes de deletar
+    existing_collaborator = collaborators_collection.find_one({"_id": object_id})
+    if not existing_collaborator:
         raise HTTPException(status_code=404, detail="Colaborador não encontrado")
-    
+
+    # Excluir o colaborador
+    result = collaborators_collection.delete_one({"_id": object_id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Erro ao excluir colaborador")
+
     return {"message": "Colaborador removido com sucesso"}
