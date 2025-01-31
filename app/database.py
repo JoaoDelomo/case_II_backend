@@ -8,5 +8,5 @@ collaborators_collection = db["collaborators"]
 feedbacks_collection = db["feedback"]
 funcionarios_collection = db["funcionarios"]
 plans_collection = db["planos"]
-
+ps_collection = db["processo_seletivo"]
 
